@@ -226,15 +226,11 @@ include any extaneous information or R code!
 
 You can add math symbols using LaTeX syntax. For example,
 
-    $$
-      e^{i\pi} = -1
-    $$
+    $$e^{i\pi} = -1$$
 
 will render as a display equation like so:
 
-$$
-e^{i\pi} = -1
-$$ while
+$$e^{i\pi} = -1$$ while
 
     $e^{ix} = \cos(x) + i \sin(x)$
 

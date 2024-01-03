@@ -90,16 +90,12 @@ You can always supply the option `echo=FALSE` to a code chunk if you do not want
 You can add math symbols using LaTeX syntax. For example,
 
 ```{}
-$$
-  e^{i\pi} = -1
-$$
+$$e^{i\pi} = -1$$
 ```
 
 will render as a display equation like so:
 
-$$
-e^{i\pi} = -1
-$$
+$$e^{i\pi} = -1$$
 while
 
 ```{}
