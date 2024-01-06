@@ -18,17 +18,19 @@ output: github_document
 ```
 
 There are many other options you can add to your YAML, but these are the
-basics. Some others that I use quite often are `toc: "true"` to add a
-table of contents and `urlcolor: "cyan"` to differentiate hyperlinks by
-coloring them light blue.
+basics. Some others that I use quite often are `toc: true` to add a
+table of contents and `urlcolor: cyan` to differentiate hyperlinks by
+coloring them light blue. You can also use `output: pdf_document`, which
+I can view in GitHub Classroom, but you will need a TeX installation for
+that to work.
 
 You can now complete your writeup in between “chunks” of code (see the
-`README.Rmd`).
+`README.Rmd` and `example_lab_report.Rmd`).
 
 # 1 Examples
 
 Below are a bunch of examples of things you can add to your report. The
-code for creating them can be found in `README.md`.
+code for creating them can be found in `README.Rmd`.
 
 ## 1.1 Plots
 
@@ -210,19 +212,30 @@ get some tables generated using `kableExtra` to render in a
 
 You can always supply the option `echo=FALSE` to a code chunk if you do
 not want it to render. Keep your writeups short and to the point. Don’t
-include any extaneous information or R code!
+include any extraneous information or R code!
 
-## 1.4 Other
+## 1.4 Rendering results of r-code inline
 
-### 1.4.1 Images
+If you want to add a value, for example the estimate of a parameter in a
+statistical model, to the report, you can do so using the syntax below,
+replacing `rcode` with some code that would print the result to the
+standard out.
+
+``` html
+`r rcode`
+```
+
+## 1.5 Other
+
+### 1.5.1 Images
 
 `![](path-to-image)`
 
-### 1.4.2 Hyperlinks
+### 1.5.2 Hyperlinks
 
 `[text to disply](url)`
 
-### 1.4.3 Math
+### 1.5.3 Math
 
 You can add math symbols using LaTeX syntax. For example,
 
