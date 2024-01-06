@@ -1,0 +1,116 @@
+---
+title: "Example lab report"
+subtitle: "Relationship of Remotely Sensed Data to Conifer Quadratic Mean Diameter"
+output: pdf_document
+author: "Calvin Hobbes"
+date: "1 January 2024"
+linkcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, fig.align = "center")
+library(tidyverse)
+library(patchwork)
+```
+
+```{r}
+set.seed(5621)
+
+# simulate data
+  n <- 70
+  n_train <- n * 0.9
+  n_test <- n * 0.1
+  beta <- c(30, -0.2)
+  X <- cbind(
+    rep(1, n),
+    runif(n, min = 5, 45)
+  )
+  dat <- tibble(
+    b5 = X[,2],
+    y = X%*%beta + rnorm(n, sd = 4)
+  )
+  
+# fit the model
+  fit <- lm(y ~ b5, data = dat)
+  
+# add residuals
+  dat <- dat %>% mutate(
+    res = rstudent(fit),
+    fitted = fitted(fit)
+  )
+  
+# make predictions
+  dat <- dat %>% mutate(
+    pred = predict(fit, dat),
+    low = predict(fit, dat, interval = "confidence")[,2],
+    high = predict(fit, dat, interval = "confidence")[,3],
+  )
+  
+# get CIs
+  cis <- confint(fit)
+  
+# get p-values
+  pvals <- summary(fit)$coefficients[,4]
+  
+# get R-squared
+  r2 <- summary(fit)$adj.r.squared
+```
+
+
+# Introduction
+
+Remotely sensed data are relatively easy to obtain and can provide complete census information for certain variables over a large area.  These data may be able to be used to predict quadratic mean diameter of conifers (inches), especially band-5 reflectance.  
+
+Quadratic mean diameter (QMD) is used to derive wood volume.  If band-5 reflectance could be used as a proxy for quadratic mean diameter, estimates of wood volume in a stand could then be made relatively rapidly and cheaply using remotely sensed data. 
+
+
+# Methods
+
+In 1998, the QMD of conifers was measured by field crews in 70 1-hectare plots as part of the Continuous Vegetation Survey (CVS). CVS plots are chosen for sampling each year based on a randomly located systematic grid of plots established by the USDA Forest Service in order to make inference to overall forest health and status in region 6 (Oregon and Washington). All 70 plots selected for the 1998 CVS sample in the Douglas-fir/Western Hemlock ecoregion of western Oregon were included in this study. Also in 1998, remotely sensed reflectance values were measured over the entire region and recorded for each 25 x 25 m unit of land (pixel). The reflectance data for the 70 CVS plots were extracted for use in analysis. 
+
+The following statistical model was fit to the data:
+
+$$
+y_i = \beta_0 + \beta_1x_i + \epsilon_i
+$$
+
+where $y_i$ is the observed QMD of conifers for the $i^\text{th}$ training stand, $x_i$ is the band-5 reflectance for the $i^\text{th}$ training stand, and $\beta_0$ and $\beta_1$ are unknown parameters to be estimated. It was assumed that $\epsilon_i\sim \mathcal{N}(0, \sigma^2)$. This model assumes a linear relationship between QMD of conifers and band-5 reflectance, and also assumes that the variance of QMD of conifers among stands with the same reflectance value is the same as the variance of QMD of conifers among stands with a different reflectance value.
+
+# Results
+
+Assumptions were checked and appeared to be reasonably met (Figure \ref{fig:resids}).   
+
+```{r resids, fig.height = 3, out.width="70%", fig.cap="Studentized residuals versus the fitted values."}
+
+(rvf <- ggplot(dat, aes(x = fitted, y = res)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  theme_classic() +
+  xlab("Fitted values") +
+  ylab("Studentized residuals"))
+
+```
+
+Band-5 reflectance was found to be a strong predictor of QMD ($p =$ `r signif(pvals[2], digits = 2)`; Figure \ref{fig:pred_plot}). The adjusted $R^2$ for the fit to the data was `r round(r2, 2)`. 
+
+```{r warning=FALSE, pred_plot, out.width="70%", fig.cap="Fitted model with 95\\% confidence intervals."}
+
+ggplot(data = dat, aes(x = b5, y = y)) +
+  geom_point() +
+  geom_line(aes(y = pred)) +
+  geom_line(aes(y = high), linetype = "dashed", linewidth = 1) +
+  geom_line(aes(y = low), linetype = "dashed", linewidth = 1) +
+  theme_classic(base_size = 16) +
+  ylab("Quadratic mean diameter") +
+  xlab("Band-5 reflectance")
+
+```
+
+# Conclusions
+
+There was a significant relationship between QMD and band-5 reflectance but the $R^2$ was low.  Because of the low $R^2$, band-5 reflectance might not be useful for making predictions of QMD of conifers. 
+
+More explanatory variables could be explored in the future to see if they could predict better.  
+
+
+

@@ -1,0 +1,142 @@
+---
+title: "Example lab report"
+subtitle: "Relationship of Remotely Sensed Data to Conifer Quadratic Mean Diameter"
+output: pdf_document
+author: "Susie Derkins"
+date: "1 January 2024"
+linkcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, fig.align = "center")
+library(tidyverse)
+library(patchwork)
+```
+
+```{r}
+set.seed(5621)
+
+# simulate data
+  n <- 70
+  n_train <- n * 0.9
+  n_test <- n * 0.1
+  beta <- c(30, -0.2)
+  X <- cbind(
+    rep(1, n),
+    runif(n, min = 5, 45)
+  )
+  dat <- tibble(
+    b5 = X[,2],
+    y = X%*%beta + rnorm(n, sd = 4)
+  )
+  
+  dat <- dat %>% mutate(
+    set = rep("train", n)
+  ) 
+  dat$set[sample(1:n, n_test)] <- "test"
+  dat_train <- filter(dat, set == "train")
+  
+# fit the model
+  fit <- lm(y ~ b5, data = dat_train)
+  
+# add residuals
+  dat_train <- dat_train %>% mutate(
+    res = rstudent(fit),
+    fitted = fitted(fit)
+  )
+  
+# make predictions
+  dat <- dat %>% mutate(
+    pred = predict(fit, dat),
+    low = predict(fit, dat, interval = "prediction")[,2],
+    high = predict(fit, dat, interval = "prediction")[,3],
+  )
+  
+# get mean absolute error
+  mae <- dat %>% filter(set == "test") %>%
+    {mean(abs(.$pred - .$y))}
+  
+# get CIs
+  cis <- confint(fit)
+  
+# get R-squared
+  r2 <- summary(fit)$adj.r.squared
+```
+
+
+# Introduction
+
+Remotely sensed data are relatively easy to obtain and can provide complete census information for certain variables over a large area.  In 1998, a study was undertaken to examine the relationship between quadratic mean diameter in inches of conifers in a stand and the signal obtained from the fifth band in remotely sensed reflectance data, a band that represents reflectance of mid-infrared light\footnote{Clear statement of research question}.  
+
+Quadratic mean diameter (QMD) is used to derive wood volume.  If band-5 reflectance could be used as a proxy for QMD, estimates of wood volume in a stand could then be made relatively rapidly and cheaply using remotely sensed data.  Previous research with predictive models\footnote{A predictive model is a model where the goal is predicting values of the response variable in other datasets.  You may be used to seeing inferential models, where the goal is to estimate parameters of the statistical model (i.e., estimate and describe relationships).} indicates that the mean absolute error (MAE) should be less than 3 inches on a test set of data for band-5 reflectance to be considered a sufficient single linear predictor of quadratic mean diameter\footnote{Statement of biologically important effect with justification}. In addition, the USDA Forest Service has established that the $R^2$ for the linear relationship between two variables should be at least 0.75 for the model to be considered useful for prediction\footnote{Statement of biological / practical benchmarks for statistics calculated from the fitted model}.
+
+# Methods
+
+In 1998, the QMD of conifers was measured by field crews in 70 1-hectare plots as part of the Continuous Vegetation Survey (CVS).  CVS plots are chosen for sampling each year based on a randomly located systematic grid of plots established by the USDA Forest Service in order to make inference to overall forest health and status in region 6 (Oregon and Washington).  All 70 plots selected for the 1998 CVS sample in the Douglas-fir/Western Hemlock ecoregion of western Oregon were included in this study.  
+
+Also in 1998, remotely sensed reflectance values were measured over the entire region and recorded for each 25 x 25 m unit of land (pixel)\footnote{Description of how the study was conducted and how the data were collected}. The reflectance data for the 70 CVS plots were extracted for use in analysis.  As the 70 plots are a random sample of all possible forested plots in the ecoregion, the scope of inference for this study is to all forested land in the Douglas-fir/Western Hemlock ecoregion of western Oregon in 1998\footnote{Statment of scope of inference, justified based on sampling design and expert knowledge}.
+
+The predictive performance of a linear model using band-5 reflectance to predict mean QMD of conifers was tested based on a random subset of held-out data. The test set was 5\% of the original dataset.  All effects of interest, including the linear slope, $R^2$, and MAE were estimated from that model.  All analyses were done with R version 4.0.5 (2021).
+
+The following statistical model was fit to the data:
+
+$$
+y_i = \beta_0 + \beta_1x_i + \epsilon_i
+$$
+
+where $y_i$ is the observed QMD of conifers for the $i^\text{th}$ training stand, $i = 1,2,...,63$, $x_i$ is the band-5 reflectance for the $i^\text{th}$ training stand, and $\beta_0$ and $\beta_1$ are unknown parameters to be estimated. $\beta_0$ represents the expected QMD when band-5 reflectance is zero, while $\beta_1$ represents the linear change in the mean QMD for a one-unit increase in band-5 reflectance. It was assumed that $\epsilon_1, \epsilon_2,...,\epsilon_n$ were independent and identically distributed normal errors with mean zero and variance $\sigma^2$. This model assumes a linear relationship between mean QMD of conifers and band-5 reflectance, and also assumes that the variance of QMD of conifers among stands with the same reflectance value is the same as the variance of QMD of conifers among stands with a different reflectance value\footnote{Description of statistical model with all terms correctly defined}.
+
+# Results
+
+Assumptions were checked graphically using the residuals from the fitted model. The model assumption of a linear relationship between QMD and band-5 reflectance appeared to be adequately satisfied as was the model assumption of homogeneity of variance with respect to the predicted value (Figure \ref{fig:resids})\footnote{Statement on how assumptions were checked and anything that was done if any assumptions were violated. Figures included in lab write-up as evidence assumptions were checked}.   
+
+```{r resids, fig.height = 3, out.width="100%", fig.cap="a) Studentized residuals versus the fitted values to check homogeneity of variance assumption. Because this assumption is reasonable met, prediction intervals are valid across the observed range of Band-5 reflectance. b) Studentized residuals versus the explanatory variable to check linearity assumption."}
+
+rvf <- ggplot(dat_train, aes(x = fitted, y = res)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  theme_classic() +
+  xlab("Fitted values") +
+  ylab("Studentized residuals") +
+  ggtitle("a)")
+
+rvp <- ggplot(dat_train, aes(x = b5, y = res)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  theme_classic() +
+  xlab("Band-5 reflectance") +
+  ylab("Studentized residuals") +
+  ggtitle("b)")
+
+rvf + rvp
+
+```
+
+The fitted model predicts a decrease of `r abs(round(coef(fit)[2], 2))` inches (95\% CI [`r round(abs(cis[2,2]), 2)` inches,  `r round(abs(cis[2,1]), 2)` inches])\footnote{Confidence interval (with units) is valid because we only fit one model, selected \textit{a priori}} in the mean QMD\footnote{Notice that while the response is an individual value of QMD, (see model statement) the statistical interpretation is about the mean of the distribution of QMD.} for every 1 unit increase in the band-5 reflectance (Figure \ref{fig:pred_plot}). The adjusted $R^2$ for the fit to the training data was `r round(r2, 2)`, while the MAE when predicting the test data was `r round(mae, 2)`. 
+
+```{r warning=FALSE, pred_plot, out.width="70%", fig.cap="Fitted model with 95\\% prediction intervals. The observed data are overlayed and color coded to indicate which observations were used for training and which were used for testing"}
+
+ggplot(data = dat, aes(x = b5, y = y)) +
+  geom_point(aes(color=set)) +
+  geom_line(aes(y = pred)) +
+  geom_line(aes(y = high), linetype = "dashed", linewidth = 1) +
+  geom_line(aes(y = low), linetype = "dashed", linewidth = 1) +
+  theme_classic(base_size = 16) +
+  theme(
+    legend.title = element_blank()
+  ) +
+  scale_color_manual(
+    values = c("red","blue")
+  ) +
+  ylab("Quadratic mean diameter") +
+  xlab("Band-5 reflectance")
+
+```
+
+# Conclusions
+
+Although the relationship between mean QMD and band-5 reflectance was statistically detectable, the ability to predict an individual plot's QMD of conifers from band-5 reflectance alone was below the desired threshold considered useful (desired MAE was 3 inches, while MAE from the model was `r round(mae, 2)` inches).  The adjusted $R^2$ for the fit to the training data was also below the desired threshold for the model to be considered useful (minimum $R^2$ for utility was 0.75, while the adjusted $R^2$ from the fit was `r round(r2, 2)`)\footnote{Results and conclusions relate directly back to the purpose of the research}.  Predictive ability from this model gave 95% prediction intervals with a range of about `r round(abs(dat$low[1] - dat$high[1]))` inches (Figure \ref{fig:pred_plot})\footnote{A prediction interval is different from a confidence interval, and is appropriate when the goal is prediction. Make sure you understand why a prediction interval and not a confidence interval was used in the example.}; this is too large to be of practical use for making estimates of stand wood volume.  Based on these results, band-5 reflectance alone is not useful for making predictions of stand wood volume for stands in the Douglas-fir/Western Hemlock ecoregion of western Oregon in 1998, though it shows promise as a potentially useful predictor if in combination with other variables. 
+
+Further refinement of the model (e.g., inclusion of other remotely sensed explanatory variables) may improve the model's ability to predict QMD of conifers within established limits.   In addition, further study on variability of remote sensing measures across years may be needed to make sure these results were not specific to the conditions in 1998.  With data collected from additional years and environmental conditions, environmental variables could be collected and used in a more complex predictive model, as needed\footnote{Limitation of project listed specifically.  Further research possibilities discussed, with specific examples of what researches may want to focus on in the future.}.
+
+
