@@ -75,6 +75,15 @@ Tables such as Table \@ref(tab:eg-tab) can also be referred to in the text by re
 
 You can always supply the option `echo=FALSE` to a code chunk if you do not want it to render. Keep your writeups short and to the point. Don't include any extaneous information or R code!
 
+## Rendering results of r-code inline
+
+If you want to add a value, for example the estimate of a parameter in a statistical model, to the report, you can do so using the syntax below, replacing `<rcode>` with some code that would print the result to the standard out.
+
+```{}
+`r <rcode>`
+```
+
+
 ## Other
 
 ### Images
