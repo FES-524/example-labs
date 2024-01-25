@@ -7,6 +7,8 @@ always_allow_html: true
 
 The repository provides examples of how to create your lab write-ups such that I can view and provide feedback within GitHub Classroom.
 
+edit from somewhere else
+
 The first few lines of your `.Rmd` file will be a YAML. They should look something like this:
 
 ```{html}
