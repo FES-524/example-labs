@@ -1,0 +1,119 @@
+---
+title: "Lab examples, code and content"
+format: gfm
+prefer-html: true
+---
+
+The repository provides examples of how to create your lab write-ups such that I can view and provide feedback within GitHub Classroom.
+
+The first few lines of your `.qmd` file will be a YAML. They should look something like this:
+
+```{html}
+#| eval: false
+
+---
+title: "Title"
+author: "Your name"
+date: "the date"
+format: gfm
+---
+```
+
+There are many other options you can add to your YAML, but these are the basics. Some others that I use quite often are `toc: true` to add a table of contents and `urlcolor: cyan` to differentiate hyperlinks by coloring them light blue. You can also use `format: pdf`, which I can view in GitHub Classroom, but you will need a TeX installation for that to work.
+
+You can now complete your writeup in between "chunks" of code (see the `README.qmd` and `example_lab_report.qmd` to compare the .qmd document to the output).
+
+# Examples
+
+Below are a bunch of examples of things you can add to your lab reports. The code for creating them can be found in `README.qmd`.
+
+## Plots
+
+
+```{r}
+#| fig-height: 3
+#| fig-width: 3
+#| fig-cap: "Example plot."
+#| label: "fig-plotname"
+
+
+library(tidyverse)
+
+# create a plot
+  ggplot(data = pressure, aes(x = temperature, y = pressure)) +
+    geom_point() +
+    theme_classic() +
+    geom_smooth(se = F)
+```
+
+You can add figure captions using the `#| fig-cap: "caption"` code block argument **paired with** `#| label: "fig-name"`, where you replace `name` with a unique identifier for each figure. **Note that prefacing the name with `fig-` is necessary to get the caption to render and the cross-referencing to work.** To reference a plot in the document, such as @fig-plotname, use the syntax `@fig-name` inside the markdown text.
+
+## Tables
+
+Tables can be rendered straight from dataframes using the `kableExtra` package.
+
+```{r}
+#| label: "tbl-eg_tab"
+#| tbl-cap: "An example table."
+
+library(kableExtra)
+# pass a few lines of a dataframe to kable
+  head(pressure) %>%
+    kable() %>%
+    kable_classic(full_width = FALSE) %>%
+    kable_styling(
+      bootstrap_options = c("striped", "hover"), full_width = FALSE
+    )
+
+```
+
+Tables such as @tbl-eg_tab can also be referred to in the text by referencing the label supplied to the `label` argument using the syntax `@tbl-label`. 
+
+**Note**: that you need to start the label with `tbl-` in order for the cross-referencing to work (See the `README.qmd` for the code).
+
+**Note**: You may need to add `prefer-html: true` to the YAML to get some tables generated using `kableExtra` to render in a `github_document`.
+
+
+## Hiding some R code
+
+You can always supply the option `#| echo: false` to a code chunk if you do not want it to render. Keep your writeups short and to the point. Don't include any extraneous information or R code!
+
+## Rendering results of r-code inline
+
+If you want to add a value, for example the estimate of a parameter in a statistical model, to the report, you can do so using the syntax below, replacing `rcode` with some code that would print the result to the standard out.
+
+```{html}
+#| eval: false
+`r rcode`
+```
+
+
+## Other
+
+### Images
+
+`![](path-to-image)`
+
+### Hyperlinks
+
+`[text to disply](url)`
+
+### Math
+
+You can add math symbols using LaTeX syntax. For example,
+
+```{}
+$$e^{i\pi} = -1$$
+```
+
+will render as a display equation like so:
+
+$$e^{i\pi} = -1$$
+while
+
+```{}
+$e^{ix} = \cos(x) + i \sin(x)$
+```
+
+will render inline like so: $e^{ix} = \cos(x) + i \sin(x)$
+

@@ -1,13 +1,14 @@
 ---
 title: "Example lab report"
 subtitle: "Relationship of Remotely Sensed Data to Conifer Quadratic Mean Diameter"
-output: pdf_document
+format: pdf
 author: "Calvin Hobbes"
 date: "1 January 2024"
 linkcolor: blue
 ---
 
-```{r setup, include=FALSE}
+```{r setup}
+#| include: false
 knitr::opts_chunk$set(echo = F, fig.align = "center")
 library(tidyverse)
 library(patchwork)
@@ -78,9 +79,14 @@ where $y_i$ is the observed QMD of conifers for the $i^\text{th}$ training stand
 
 # Results
 
-Assumptions were checked and appeared to be reasonably met (Figure \ref{fig:resids}).   
+Assumptions were checked and appeared to be reasonably met (@fig-resids).   
 
-```{r resids, fig.height = 3, out.width="70%", fig.cap="Studentized residuals versus the fitted values."}
+```{r resids}
+#| label: "fig-resids"
+#| fig-height: 3
+#| out-width: "70%"
+#| fig-cap: "Studentized residuals versus the fitted values."
+#| 
 
 (rvf <- ggplot(dat, aes(x = fitted, y = res)) +
   geom_point() +
@@ -91,9 +97,13 @@ Assumptions were checked and appeared to be reasonably met (Figure \ref{fig:resi
 
 ```
 
-Band-5 reflectance was found to be a strong predictor of QMD ($p =$ `r signif(pvals[2], digits = 2)`; Figure \ref{fig:pred_plot}). The adjusted $R^2$ for the fit to the data was `r round(r2, 2)`. 
+Band-5 reflectance was found to be a strong predictor of QMD ($p =$ `r signif(pvals[2], digits = 2)`; @fig-pred-plot. The adjusted $R^2$ for the fit to the data was `r round(r2, 2)`. 
 
-```{r warning=FALSE, pred_plot, out.width="70%", fig.cap="Fitted model with 95\\% confidence intervals."}
+```{r pred_plot}
+#| warning: false
+#| label: "fig-pred-plot"
+#| out-width: "70%"
+#| fig-cap: "Fitted model with 95\\% confidence intervals."
 
 ggplot(data = dat, aes(x = b5, y = y)) +
   geom_point() +

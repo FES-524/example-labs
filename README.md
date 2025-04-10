@@ -1,11 +1,14 @@
-Lab Examples, code and content
-================
+# Lab examples, code and content
 
-The repository provides some examples of how to create your lab
-write-ups such that I can view and provide feedback within GitHub
-Classroom.
 
-The first few lines of your `.Rmd` file will be a YAML. They should look
+<script src="README_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="README_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+
+The repository provides examples of how to create your lab write-ups
+such that I can view and provide feedback within GitHub Classroom.
+
+The first few lines of your `.qmd` file will be a YAML. They should look
 something like this:
 
 ``` html
@@ -13,39 +16,42 @@ something like this:
 title: "Title"
 author: "Your name"
 date: "the date"
-output: github_document
+format: gfm
 ---
 ```
 
 There are many other options you can add to your YAML, but these are the
 basics. Some others that I use quite often are `toc: true` to add a
 table of contents and `urlcolor: cyan` to differentiate hyperlinks by
-coloring them light blue. You can also use `output: pdf_document`, which
-I can view in GitHub Classroom, but you will need a TeX installation for
-that to work.
+coloring them light blue. You can also use `format: pdf`, which I can
+view in GitHub Classroom, but you will need a TeX installation for that
+to work.
 
 You can now complete your writeup in between “chunks” of code (see the
-`README.Rmd` and `example_lab_report.Rmd`).
+`README.qmd` and `example_lab_report.qmd` to compare the .qmd document
+to the output).
 
-# 1 Examples
+# Examples
 
-Below are a bunch of examples of things you can add to your report. The
-code for creating them can be found in `README.Rmd`.
+Below are a bunch of examples of things you can add to your lab reports.
+The code for creating them can be found in `README.qmd`.
 
-## 1.1 Plots
+## Plots
 
 ``` r
 library(tidyverse)
 ```
 
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-    ## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-    ## ✓ tibble  3.1.6     ✓ dplyr   1.0.8
-    ## ✓ tidyr   1.2.0     ✓ stringr 1.4.0
-    ## ✓ readr   2.1.2     ✓ forcats 0.5.2
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
+    ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ✔ dplyr     1.1.4     ✔ readr     2.1.5
+    ✔ forcats   1.0.0     ✔ stringr   1.5.1
+    ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+    ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+    ✔ purrr     1.0.2     
+    ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ✖ dplyr::filter() masks stats::filter()
+    ✖ dplyr::lag()    masks stats::lag()
+    ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
 ``` r
 # create a plot
@@ -55,27 +61,26 @@ library(tidyverse)
     geom_smooth(se = F)
 ```
 
-    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+    `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
 
-<figure>
-<img src="README_files/figure-gfm/plotname-1.png"
-alt="Figure 1.1: Example plot." />
-<figcaption aria-hidden="true">Figure 1.1: Example plot.</figcaption>
-</figure>
+<div id="fig-plotname">
 
-You can reference a plot, such as Figure
-<a href="#fig:plotname">1.1</a>, using the syntax `\@ref(fig:plotname)`
-inside the markdown text if you install the `bookdown` R package and
-include the following in the YAML:
+![](README_files/figure-commonmark/fig-plotname-1.png)
 
-``` html
----
-output:
-  bookdown::github_document2
----
-```
 
-## 1.2 Tables
+Figure 1: Example plot.
+
+</div>
+
+You can add figure captions using the `#| fig-cap: "caption"` code block
+argument **paired with** `#| label: "fig-name"`, where you replace
+`name` with a unique identifier for each figure. **Note that prefacing
+the name with `fig-` is necessary to get the caption to render and the
+cross-referencing to work.** To reference a plot in the document, such
+as <a href="#fig-plotname" class="quarto-xref">Figure 1</a>, use the
+syntax `@fig-name` inside the markdown text.
+
+## Tables
 
 Tables can be rendered straight from dataframes using the `kableExtra`
 package.
@@ -84,137 +89,60 @@ package.
 library(kableExtra)
 ```
 
-    ## 
-    ## Attaching package: 'kableExtra'
 
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     group_rows
+    Attaching package: 'kableExtra'
+
+    The following object is masked from 'package:dplyr':
+
+        group_rows
 
 ``` r
 # pass a few lines of a dataframe to kable
   head(pressure) %>%
-    kable(
-      caption = "An example table.",
-      label = "eg-tab"
-    ) %>%
+    kable() %>%
     kable_classic(full_width = FALSE) %>%
     kable_styling(
       bootstrap_options = c("striped", "hover"), full_width = FALSE
     )
 ```
 
-<table class=" lightable-classic table table-striped table-hover" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; margin-left: auto; margin-right: auto; width: auto !important; margin-left: auto; margin-right: auto;">
-<caption>
+<div id="tbl-eg_tab">
 
-Table 1.1: An example table.
+Table 1: An example table.
 
-</caption>
-<thead>
-<tr>
-<th style="text-align:right;">
+<div class="cell-output-display">
 
-temperature
+| temperature | pressure |
+|------------:|---------:|
+|           0 |   0.0002 |
+|          20 |   0.0012 |
+|          40 |   0.0060 |
+|          60 |   0.0300 |
+|          80 |   0.0900 |
+|         100 |   0.2700 |
 
-</th>
-<th style="text-align:right;">
+</div>
 
-pressure
+</div>
 
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:right;">
+Tables such as <a href="#tbl-eg_tab" class="quarto-xref">Table 1</a> can
+also be referred to in the text by referencing the label supplied to the
+`label` argument using the syntax `@tbl-label`.
 
-0
+**Note**: that you need to start the label with `tbl-` in order for the
+cross-referencing to work (See the `README.qmd` for the code).
 
-</td>
-<td style="text-align:right;">
-
-0.0002
-
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-
-20
-
-</td>
-<td style="text-align:right;">
-
-0.0012
-
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-
-40
-
-</td>
-<td style="text-align:right;">
-
-0.0060
-
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-
-60
-
-</td>
-<td style="text-align:right;">
-
-0.0300
-
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-
-80
-
-</td>
-<td style="text-align:right;">
-
-0.0900
-
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-
-100
-
-</td>
-<td style="text-align:right;">
-
-0.2700
-
-</td>
-</tr>
-</tbody>
-</table>
-
-Tables such as Table <a href="#tab:eg-tab">1.1</a> can also be referred
-to in the text by referencing the label supplied to the `label` argument
-using the syntax `\@ref(tab:label)`.
-
-**Note**: You may need to add `always_allow_html: true` to the YAML to
-get some tables generated using `kableExtra` to render in a
+**Note**: You may need to add `prefer-html: true` to the YAML to get
+some tables generated using `kableExtra` to render in a
 `github_document`.
 
-## 1.3 Hiding some R code
+## Hiding some R code
 
-You can always supply the option `echo=FALSE` to a code chunk if you do
-not want it to render. Keep your writeups short and to the point. Don’t
-include any extraneous information or R code!
+You can always supply the option `#| echo: false` to a code chunk if you
+do not want it to render. Keep your writeups short and to the point.
+Don’t include any extraneous information or R code!
 
-## 1.4 Rendering results of r-code inline
+## Rendering results of r-code inline
 
 If you want to add a value, for example the estimate of a parameter in a
 statistical model, to the report, you can do so using the syntax below,
@@ -225,17 +153,17 @@ standard out.
 `r rcode`
 ```
 
-## 1.5 Other
+## Other
 
-### 1.5.1 Images
+### Images
 
 `![](path-to-image)`
 
-### 1.5.2 Hyperlinks
+### Hyperlinks
 
 `[text to disply](url)`
 
-### 1.5.3 Math
+### Math
 
 You can add math symbols using LaTeX syntax. For example,
 

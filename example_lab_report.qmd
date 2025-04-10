@@ -1,13 +1,14 @@
 ---
 title: "Example lab report"
 subtitle: "Relationship of Remotely Sensed Data to Conifer Quadratic Mean Diameter"
-output: pdf_document
+format: pdf
 author: "Susie Derkins"
 date: "1 January 2024"
 linkcolor: blue
 ---
 
-```{r setup, include=FALSE}
+```{r setup}
+#| include: false
 knitr::opts_chunk$set(echo = F, fig.align = "center")
 library(tidyverse)
 library(patchwork)
@@ -88,9 +89,13 @@ where $y_i$ is the observed QMD of conifers for the $i^\text{th}$ training stand
 
 # Results
 
-Assumptions were checked graphically using the residuals from the fitted model. The model assumption of a linear relationship between QMD and band-5 reflectance appeared to be adequately satisfied as was the model assumption of homogeneity of variance with respect to the predicted value (Figure \ref{fig:resids})\footnote{Statement on how assumptions were checked and anything that was done if any assumptions were violated. Figures included in lab write-up as evidence assumptions were checked}.   
+Assumptions were checked graphically using the residuals from the fitted model. The model assumption of a linear relationship between QMD and band-5 reflectance appeared to be adequately satisfied as was the model assumption of homogeneity of variance with respect to the predicted value (@fig-resids)\footnote{Statement on how assumptions were checked and anything that was done if any assumptions were violated. Figures included in lab write-up as evidence assumptions were checked}.   
 
-```{r resids, fig.height = 3, out.width="100%", fig.cap="a) Studentized residuals versus the fitted values to check homogeneity of variance assumption. Because this assumption is reasonable met, prediction intervals are valid across the observed range of Band-5 reflectance. b) Studentized residuals versus the explanatory variable to check linearity assumption."}
+```{r resids}
+#| label: fig-resids
+#| fig-height: 3
+#| out.width: "100%"
+#| fig-cap: "a) Studentized residuals versus the fitted values to check homogeneity of variance assumption. Because this assumption is reasonable met, prediction intervals are valid across the observed range of Band-5 reflectance. b) Studentized residuals versus the explanatory variable to check linearity assumption."
 
 rvf <- ggplot(dat_train, aes(x = fitted, y = res)) +
   geom_point() +
@@ -112,9 +117,13 @@ rvf + rvp
 
 ```
 
-The fitted model predicts a decrease of `r abs(round(coef(fit)[2], 2))` inches (95\% CI [`r round(abs(cis[2,2]), 2)` inches,  `r round(abs(cis[2,1]), 2)` inches])\footnote{Confidence interval (with units) is valid because we only fit one model, selected \textit{a priori}} in the mean QMD\footnote{Notice that while the response is an individual value of QMD, (see model statement) the statistical interpretation is about the mean of the distribution of QMD.} for every 1 unit increase in the band-5 reflectance (Figure \ref{fig:pred_plot}). The adjusted $R^2$ for the fit to the training data was `r round(r2, 2)`, while the MAE when predicting the test data was `r round(mae, 2)`. 
+The fitted model predicts a decrease of `r abs(round(coef(fit)[2], 2))` inches (95\% CI [`r round(abs(cis[2,2]), 2)` inches,  `r round(abs(cis[2,1]), 2)` inches])\footnote{Confidence interval (with units) is valid because we only fit one model, selected \textit{a priori}} in the mean QMD\footnote{Notice that while the response is an individual value of QMD, (see model statement) the statistical interpretation is about the mean of the distribution of QMD.} for every 1 unit increase in the band-5 reflectance (@fig-pred-plot). The adjusted $R^2$ for the fit to the training data was `r round(r2, 2)`, while the MAE when predicting the test data was `r round(mae, 2)`. 
 
-```{r warning=FALSE, pred_plot, out.width="70%", fig.cap="Fitted model with 95\\% prediction intervals. The observed data are overlayed and color coded to indicate which observations were used for training and which were used for testing"}
+```{r pred_plot}
+#| warning: false
+#| label: fig-pred-plot
+#| out-width: "70%"
+#| fig-cap: "Fitted model with 95\\% prediction intervals. The observed data are overlayed and color coded to indicate which observations were used for training and which were used for testing"
 
 ggplot(data = dat, aes(x = b5, y = y)) +
   geom_point(aes(color=set)) +
